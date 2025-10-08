@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "./monitor.hpp"
+#include "./monitor.h"
 
 TEST(Monitor, DetectsCriticalTemperature) {
     EXPECT_TRUE(isVitalCritical(VitalType::TEMPERATURE, 94.0f));
@@ -32,5 +32,6 @@ TEST(Monitor, AnyCriticalReturnsFalse) {
     EXPECT_FALSE(vitalsOk(98.0f, 105.0f, 98.0f));
     EXPECT_FALSE(vitalsOk(97.0f, 70.0f, 88.0f));
 }
+
 
 
