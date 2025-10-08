@@ -2,9 +2,9 @@
 #include "./monitor.h"
 
 TEST(Monitor, DetectsCriticalTemperature) {
-    EXPECT_TRUE(isVitalCritical(VitalType::TEMPERATURE, 94.0f));  // too low
-    EXPECT_TRUE(isVitalCritical(VitalType::TEMPERATURE, 103.0f)); // too high
-    EXPECT_FALSE(isVitalCritical(VitalType::TEMPERATURE, 98.0f)); // normal
+    EXPECT_TRUE(isVitalCritical(VitalType::TEMPERATURE, 94.0f));
+    EXPECT_TRUE(isVitalCritical(VitalType::TEMPERATURE, 103.0f));
+    EXPECT_FALSE(isVitalCritical(VitalType::TEMPERATURE, 98.0f));
 }
 
 TEST(Monitor, DetectsCriticalPulseRate) {
@@ -28,7 +28,8 @@ TEST(Monitor, AllVitalsOkReturnsTrue) {
 }
 
 TEST(Monitor, AnyCriticalReturnsFalse) {
-    EXPECT_FALSE(vitalsOk(104.0f, 80.0f, 96.0f)); // temp high
-    EXPECT_FALSE(vitalsOk(98.0f, 105.0f, 98.0f)); // pulse high
-    EXPECT_FALSE(vitalsOk(97.0f, 70.0f, 88.0f));  // spo2 low
+    EXPECT_FALSE(vitalsOk(104.0f, 80.0f, 96.0f));
+    EXPECT_FALSE(vitalsOk(98.0f, 105.0f, 98.0f));
+    EXPECT_FALSE(vitalsOk(97.0f, 70.0f, 88.0f));
 }
+
