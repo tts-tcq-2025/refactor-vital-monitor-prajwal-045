@@ -34,20 +34,25 @@ bool isSpo2Critical(float spo2) {
     return spo2 < SPO2_LOW;
 }
 
+struct VitalCheck {
+    bool (*check)(float);
+    const char* message;
+};
+
 int vitalsOk(float temperature, float pulseRate, float spo2) {
-    if (isTemperatureCritical(temperature)) {
-        showAlert("Temperature is critical!");
-        return 0;
-    }
+    VitalCheck checks[] = {
+        { isTemperatureCritical, "Temperature is critical!" },
+        { isPulseRateCritical,   "Pulse Rate is out of range!" },
+        { isSpo2Critical,        "Oxygen Saturation out of range!" }
+    };
 
-    if (isPulseRateCritical(pulseRate)) {
-        showAlert("Pulse Rate is out of range!");
-        return 0;
-    }
+    float values[] = { temperature, pulseRate, spo2 };
 
-    if (isSpo2Critical(spo2)) {
-        showAlert("Oxygen Saturation out of range!");
-        return 0;
+    for (size_t i = 0; i < 3; ++i) {
+        if (checks[i].check(values[i])) {
+            showAlert(checks[i].message);
+            return 0;
+        }
     }
 
     return 1;
