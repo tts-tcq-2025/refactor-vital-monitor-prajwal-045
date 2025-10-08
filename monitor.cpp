@@ -44,19 +44,29 @@ bool isVitalCritical(VitalType type, float value) {
     return value < t.low || value > t.high;
 }
 
-// This function is pure: only computes results
 std::vector<std::string> getCriticalVitals(float temperature, float pulse, float spo2) {
+    struct VitalInfo {
+        VitalType type;
+        float value;
+        const char* message;
+    };
+
+    const VitalInfo vitalChecks[] = {
+        { VitalType::TEMPERATURE, temperature, "Temperature is critical!" },
+        { VitalType::PULSE,       pulse,       "Pulse Rate is out of range!" },
+        { VitalType::SPO2,        spo2,        "Oxygen Saturation is out of range!" }
+    };
+
     std::vector<std::string> alerts;
 
-    if (isVitalCritical(VitalType::TEMPERATURE, temperature))
-        alerts.push_back("Temperature is critical!");
-    if (isVitalCritical(VitalType::PULSE, pulse))
-        alerts.push_back("Pulse Rate is out of range!");
-    if (isVitalCritical(VitalType::SPO2, spo2))
-        alerts.push_back("Oxygen Saturation is out of range!");
+    for (const auto& v : vitalChecks) {
+        if (isVitalCritical(v.type, v.value))
+            alerts.push_back(v.message);
+    }
 
     return alerts;
 }
+
 
 // ============================
 // Top-level function with I/O
