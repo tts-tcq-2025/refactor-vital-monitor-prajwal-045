@@ -3,7 +3,7 @@
 #include <thread>
 #include <chrono>
 #include <iostream>
-
+#include <string>
 using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
 constexpr float TEMP_LOW = 95.0f;
