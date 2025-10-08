@@ -2,17 +2,21 @@
 #include "./monitor.h"
 
 TEST(Monitor, TemperatureOutOfRange) {
-    EXPECT_FALSE(checkVitals(103.0f, 80.0f, 95.0f));
-    EXPECT_FALSE(checkVitals(94.0f, 80.0f, 95.0f));
+    EXPECT_FALSE(vitalsInRange(103, 80, 95));
+    EXPECT_FALSE(vitalsInRange(94, 80, 95));
 }
 
 TEST(Monitor, PulseRateOutOfRange) {
-    EXPECT_FALSE(checkVitals(98.0f, 59.0f, 95.0f));
-    EXPECT_FALSE(checkVitals(98.0f, 101.0f, 95.0f));
+    EXPECT_FALSE(vitalsInRange(98, 59, 95));
+    EXPECT_FALSE(vitalsInRange(98, 101, 95));
 }
 
-TEST(Monitor, OxygenLevelOutOfRange) {
-    EXPECT_FALSE(checkVitals(98.0f, 80.0f, 89.0f));
+TEST(Monitor, Spo2OutOfRange) {
+    EXPECT_FALSE(vitalsInRange(98, 80, 89));
 }
 
-TEST(Monitor, A
+TEST(Monitor, AllVitalsOk) {
+    EXPECT_TRUE(vitalsInRange(98.1, 70, 98));
+    EXPECT_TRUE(vitalsInRange(95, 60, 90));
+    EXPECT_TRUE(vitalsInRange(102, 100, 90));
+}
