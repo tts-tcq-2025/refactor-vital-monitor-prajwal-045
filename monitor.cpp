@@ -1,15 +1,12 @@
 #include "./monitor.h"
 #include <iostream>
-#include <thread>
-#include <chrono>
 #include <string>
 #include <vector>
 #include <unordered_map>
+
 using std::cout;
-using std::flush;
 using std::string;
 using std::vector;
-using namespace std::chrono_literals;
 
 // ============================
 // Configurable thresholds
@@ -31,12 +28,6 @@ static const std::unordered_map<VitalType, VitalThreshold> thresholds = {
 // ============================
 void showAlert(const std::string& message) {
     cout << message << '\n';
-    for (int i = 0; i < 6; ++i) {
-        cout << "\r* " << flush;
-        std::this_thread::sleep_for(1s);
-        cout << "\r *" << flush;
-        std::this_thread::sleep_for(1s);
-    }
 }
 
 // ============================
@@ -61,24 +52,26 @@ std::vector<std::string> getCriticalVitals(float temperature, float pulse, float
     };
 
     std::vector<std::string> alerts;
+    alerts.reserve(3);
 
     for (const auto& v : vitalChecks) {
-        if (isVitalCritical(v.type, v.value))
-            alerts.push_back(v.message);
+        if (isVitalCritical(v.type, v.value)) {
+            alerts.emplace_back(v.message);
+        }
     }
 
     return alerts;
 }
 
-
 // ============================
 // Top-level function with I/O
 // ============================
 bool vitalsOk(float temperature, float pulseRate, float spo2) {
-    auto alerts = getCriticalVitals(temperature, pulseRate, spo2);
+    const auto alerts = getCriticalVitals(temperature, pulseRate, spo2);
 
-    for (const auto& msg : alerts)
+    for (const auto& msg : alerts) {
         showAlert(msg);
+    }
 
     return alerts.empty();
 }
