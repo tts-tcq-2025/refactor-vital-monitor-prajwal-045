@@ -1,77 +1,48 @@
 #include "./monitor.h"
 #include <iostream>
-#include <string>
-#include <vector>
-#include <unordered_map>
+#include <thread>
+#include <chrono>
+#include <algorithm>
+using std::cout, std::flush, std::this_thread::sleep_for, std::chrono::seconds;
 
-using std::cout;
-using std::string;
-using std::vector;
+bool isTemperatureInRange(float temperature) {
+    return temperature >= 95 && temperature <= 102;
+}
 
-// ============================
-// Configurable thresholds
-// ============================
-struct VitalThreshold {
-    float low;
-    float high;
+bool isPulseRateInRange(float pulseRate) {
+    return pulseRate >= 60 && pulseRate <= 100;
+}
+
+bool isSpo2InRange(float spo2) {
+    return spo2 >= 90;
+}
+
+void alert(const char* message) {
+    cout << message << "\n";
+    for (int i = 0; i < 6; i++) {
+        cout << "\r* " << flush;
+        sleep_for(seconds(1));
+        cout << "\r *" << flush;
+        sleep_for(seconds(1));
+    }
+}
+
+struct VitalCheck {
+    bool ok;
+    const char* message;
 };
 
-// Thresholds for various vitals
-static const std::unordered_map<VitalType, VitalThreshold> thresholds = {
-    { VitalType::TEMPERATURE, {95.0f, 102.0f} },
-    { VitalType::PULSE,       {60.0f, 100.0f} },
-    { VitalType::SPO2,        {90.0f, 100.0f} }
-};
-
-// ============================
-// I/O separation (side effect)
-// ============================
-void showAlert(const std::string& message) {
-    cout << message << '\n';
-}
-
-// ============================
-// Pure functional logic
-// ============================
-bool isVitalCritical(VitalType type, float value) {
-    const auto& t = thresholds.at(type);
-    return value < t.low || value > t.high;
-}
-
-std::vector<std::string> getCriticalVitals(float temperature, float pulse, float spo2) {
-    struct VitalInfo {
-        VitalType type;
-        float value;
-        const char* message;
+bool vitalsInRange(float temperature, float pulseRate, float spo2) {
+    const VitalCheck checks[] = {
+        {isTemperatureInRange(temperature), "Temperature is critical!"},
+        {isPulseRateInRange(pulseRate), "Pulse Rate is out of range!"},
+        {isSpo2InRange(spo2), "Oxygen Saturation out of range!"}
     };
-
-    const VitalInfo vitalChecks[] = {
-        { VitalType::TEMPERATURE, temperature, "Temperature is critical!" },
-        { VitalType::PULSE,       pulse,       "Pulse Rate is out of range!" },
-        { VitalType::SPO2,        spo2,        "Oxygen Saturation is out of range!" }
-    };
-
-    std::vector<std::string> alerts;
-    alerts.reserve(3);
-
-    for (const auto& v : vitalChecks) {
-        if (isVitalCritical(v.type, v.value)) {
-            alerts.emplace_back(v.message);
-        }
+    auto it = std::find_if(std::begin(checks), std::end(checks),
+                           [](const VitalCheck& check){ return !check.ok; });
+    if (it != std::end(checks)) {
+        alert(it->message);
+        return false;
     }
-
-    return alerts;
-}
-
-// ============================
-// Top-level function with I/O
-// ============================
-bool vitalsOk(float temperature, float pulseRate, float spo2) {
-    const auto alerts = getCriticalVitals(temperature, pulseRate, spo2);
-
-    for (const auto& msg : alerts) {
-        showAlert(msg);
-    }
-
-    return alerts.empty();
+    return true;
 }
